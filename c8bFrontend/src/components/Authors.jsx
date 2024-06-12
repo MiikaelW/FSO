@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
 
 const Authors = (props) => {
-  const authors = []
+  const [authors, setAuthors] = useState([])
+  const { loading, data } = useQuery(ALL_AUTHORS)
 
-  const result = useQuery(ALL_AUTHORS)
-  if (result.loading) {
+  useEffect(() => {
+    if (!loading && data) {
+      setAuthors(data.allAuthors)
+    }
+  }, [loading, data])
+
+  if (loading) {
     return (
       <div>
         Loading...
@@ -16,35 +22,25 @@ const Authors = (props) => {
 
   return (
     <div>
-      <h2>authors</h2>
-      <table>
-        <tbody>
-          <tr>
-            <th></th>
-            <th>born</th>
-            <th>books</th>
-          </tr>
-          {result.data.allAuthors.map((a) => (
-            <tr key={a.name}>
-              <td>{a.name}</td>
-              <td>{a.born}</td>
-              <td>{a.bookCount}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <SetAuthorBirth></SetAuthorBirth>
+      <AuthorsList authors={authors}></AuthorsList>
+      <SetAuthorBirthForm authors={authors}></SetAuthorBirthForm>
     </div>
   )
 }
 
-
-const SetAuthorBirth = () => {
+const SetAuthorBirthForm = ({ authors }) => {
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }]
   })
+
+  useEffect(() => {
+    const author = authors.find(a => a.name === name)
+    if (author) {
+      setBorn(author.born)
+    }
+  }, [name])
 
   const submit = async (event) => {
     event.preventDefault()
@@ -58,13 +54,9 @@ const SetAuthorBirth = () => {
   return (
     <div>
       <form onSubmit={submit}>
-        <div>
-          Name
-          <input
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-          />
-        </div>
+        <select onChange={({ target }) => setName(target.value)}>
+          <AuthorOptions authors={authors}></AuthorOptions>
+        </select>
         <div>
           Born
           <input
@@ -76,6 +68,43 @@ const SetAuthorBirth = () => {
       </form>
     </div>
   )
+}
+
+const AuthorOptions = ({ authors }) => {
+  const emptyOption = [(<option key="empty" value="">Select author</option>)]
+  const authorOptions = authors.map(a => {
+    return (
+      <option key={a.name} value={a.name}>{a.name}</option>
+    )
+  })
+  return emptyOption.concat(authorOptions)
+}
+
+
+
+const AuthorsList = ({ authors }) => {
+  return (
+    <div>
+      <h2>authors</h2>
+      <table>
+        <tbody>
+          <tr>
+            <th></th>
+            <th>born</th>
+            <th>books</th>
+          </tr>
+          {authors.map((a) => (
+            <tr key={a.name}>
+              <td>{a.name}</td>
+              <td>{a.born}</td>
+              <td>{a.bookCount}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+
 }
 
 
