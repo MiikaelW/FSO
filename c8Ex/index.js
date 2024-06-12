@@ -125,14 +125,18 @@ const typeDefs = `
   type Mutation {
     addBook (
         title: String!
-        author: String!,
-        published: Int,
-        genres: [String!]!
+        author: String!
+        published: Int
+        genre: String!
     ): Book
     editAuthor (
         name: String!
         setBornTo: Int!
     ): Author
+    addGenre (
+        title: String!
+        genre: String!
+    ): Book
   }
 `
 
@@ -144,6 +148,7 @@ const resolvers = {
             if (!args.author && !args.genre) {
                 return books
             }
+
             return books.filter(b => {
                 if (args.author && b.author !== args.author) return false
                 if (args.genre && !b.genres.includes(args.genre)) return false
@@ -161,8 +166,8 @@ const resolvers = {
     },
     Mutation: {
         addBook: (root, args) => {
-            const newBook = { ...args, id: uuid() }
-            books = books.concat(books, newBook)
+            const { genre, ...newBook } = { ...args, id: uuid(), genres: [args.genre] }
+            books = books.concat(newBook)
             if (!authors.find(a => a.name === newBook.author)) {
                 authors = authors.concat({ name: newBook.author, id: uuid() })
             }
@@ -174,7 +179,13 @@ const resolvers = {
             const newAuthor = { ...author, born: args.setBornTo }
             authors = authors.map(a => a.name === args.name ? newAuthor : a)
             return newAuthor
-        }
+        },
+        addGenre: (root, args) => {
+            books = books.map((b) => {
+                return b.title === args.title ? { ...b, genres: b.genres.concat(args.genre) } : b
+            })
+            return books.find(b => b.title === args.title)
+        },
     }
 }
 
