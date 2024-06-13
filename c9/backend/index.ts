@@ -1,5 +1,6 @@
 import express from 'express';
 import diaryService from './services/diagnosisService'
+import patientService from './services/patientService'
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,10 @@ app.get('/api/ping', (_req, res) => {
 
 app.get('/api/diagnoses', (_req, res) => {
     res.send(diaryService.getDiagnoses())
+});
+
+app.get('/api/patients', (_req, res) => {
+    res.send(patientService.getNonSensitivePatients())
 });
 
 
