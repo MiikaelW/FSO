@@ -1,6 +1,7 @@
 import express from 'express';
 import diaryService from './services/diagnosisService'
 import patientService from './services/patientService'
+import { Patient } from './types';
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,10 @@ app.get('/api/patients', (_req, res) => {
     res.send(patientService.getNonSensitivePatients())
 });
 
+app.post('/api/patients', (req, res) => {
+    const Patient = req.body as Omit<Patient, "id">
+    res.send(patientService.addPatient(Patient))
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
