@@ -22,8 +22,7 @@ const getNonSensitivePatient = (id: string): Patient => {
         throw Error("Patient not found")
     }
     return {
-        ...patient,
-        entries: []
+        ...patient
     }
 }
 

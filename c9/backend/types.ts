@@ -23,6 +23,62 @@ export enum Gender {
     Other = "other"
 }
 
-export interface Entry {
-    description: string
+
+// id: 'd811e46d-70b3-4d90-b090-4535c7cf8fb1',
+// date: '2015-01-02',
+// type: 'Hospital',
+// specialist: 'MD House',
+// diagnosisCodes: ['S62.5'],
+// description:
+//     "Healing time appr. 2 weeks. patient doesn't remember how he got the injury.",
+// discharge: {
+//     date: '2015-01-16',
+//     criteria: 'Thumb has healed.',
+// },
+
+interface BaseEntry {
+    id: string;
+    description: string;
+    date: string;
+    specialist: string;
+    diagnosisCodes?: Array<Diagnosis["code"]>;
 }
+
+export enum HealthCheckRating {
+    "Healthy" = 0,
+    "LowRisk" = 1,
+    "HighRisk" = 2,
+    "CriticalRisk" = 3
+}
+
+interface HealthCheckEntry extends BaseEntry {
+    type: "HealthCheck";
+    healthCheckRating: HealthCheckRating;
+}
+
+interface OccupationalHealthcareEntry extends BaseEntry {
+    type: "OccupationalHealthcare",
+    employerName: string
+    sickLeave?: {
+        startDate: string,
+        endDate: string
+    }
+}
+
+interface HospitalEntry extends BaseEntry {
+    type: "Hospital",
+    discharge: {
+        date: string,
+        criteria: string
+    },
+}
+
+export type Entry =
+    | HospitalEntry
+    | OccupationalHealthcareEntry
+    | HealthCheckEntry;
+
+//     // Define special omit for unions
+// type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
+// // Define Entry without the 'id' property
+// type EntryWithoutId = UnionOmit<Entry, 'id'>;
