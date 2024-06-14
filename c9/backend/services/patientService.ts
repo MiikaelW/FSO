@@ -1,6 +1,6 @@
 import patients from "../data/patients"
 import { Patient } from "../types"
-import { v1 as uuid } from 'uuid'
+import { toNewPatient } from "../utils"
 
 
 const getNonSensitivePatients = (): Omit<Patient, "ssn">[] => {
@@ -9,11 +9,13 @@ const getNonSensitivePatients = (): Omit<Patient, "ssn">[] => {
     }))
 }
 
-const addPatient = (patient: Omit<Patient, "id">): Patient => {
-    const newPatient = { ...patient, id: uuid() }
-    patients.concat(newPatient)
-    return newPatient
+const addPatient = (object: unknown): Patient => {
+    const newPatient: Patient = toNewPatient(object)
+    //Do not know how to keep the changes in memory...
+    //inMemoryPatients = inMemoryPatients.concat(newPatient)
+    return toNewPatient(object)
 }
+
 
 export default {
     getNonSensitivePatients,
