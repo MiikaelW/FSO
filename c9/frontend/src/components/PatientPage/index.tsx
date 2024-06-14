@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { Patient } from "../../types";
 import patientService from "../../services/patients";
 import { useParams } from "react-router-dom";
+import Entries from "./Entries";
 
 const PatientPage = () => {
 
@@ -51,6 +52,10 @@ const PatientPage = () => {
       <div>
         SSN: {patient.ssn}
       </div>
+      <hr></hr>
+      <h4>Entries</h4>
+      {patient.entries ?
+        <Entries entries={patient.entries}></Entries> : null}
     </div>
   );
 };
