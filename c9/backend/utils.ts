@@ -1,4 +1,4 @@
-import { Patient, Gender } from "./types";
+import { NewPatient, Gender } from "./types";
 import { v1 as uuid } from "uuid"
 
 function isString(text: unknown): text is string {
@@ -13,7 +13,7 @@ function isGender(text: string): text is Gender {
     return Object.values(Gender).map(v => v.toString()).includes(text)
 }
 
-export function toNewPatient(object: unknown): Patient {
+export function toNewPatient(object: unknown): NewPatient {
 
     if (!object || typeof object !== 'object') {
         throw new Error('Incorrect or missing data');
